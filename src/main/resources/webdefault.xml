@@ -1,0 +1,410 @@
+<!--<?xml version="1.0" encoding="ISO-8859-1"?>-->
+
+<!--&lt;!&ndash; ===================================================================== &ndash;&gt;-->
+<!--&lt;!&ndash; This file contains the default descriptor for web applications.       &ndash;&gt;-->
+<!--&lt;!&ndash; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - &ndash;&gt;-->
+<!--&lt;!&ndash; The intent of this descriptor is to include jetty specific or common  &ndash;&gt;-->
+<!--&lt;!&ndash; configuration for all webapps.   If a context has a webdefault.xml    &ndash;&gt;-->
+<!--&lt;!&ndash; descriptor, it is applied before the contexts own web.xml file        &ndash;&gt;-->
+<!--&lt;!&ndash;                                                                       &ndash;&gt;-->
+<!--&lt;!&ndash; A context may be assigned a default descriptor by:                    &ndash;&gt;-->
+<!--&lt;!&ndash;  + Calling WebApplicationContext.setDefaultsDescriptor                &ndash;&gt;-->
+<!--&lt;!&ndash;  + Passed an arg to addWebApplications                                &ndash;&gt;-->
+<!--&lt;!&ndash;                                                                       &ndash;&gt;-->
+<!--&lt;!&ndash; This file is used both as the resource within the jetty.jar (which is &ndash;&gt;-->
+<!--&lt;!&ndash; used as the default if no explicit defaults descriptor is set) and it &ndash;&gt;-->
+<!--&lt;!&ndash; is copied to the etc directory of the Jetty distro and explicitly     &ndash;&gt;-->
+<!--&lt;!&ndash; by the jetty.xml file.                                                &ndash;&gt;-->
+<!--&lt;!&ndash;                                                                       &ndash;&gt;-->
+<!--&lt;!&ndash; ===================================================================== &ndash;&gt;-->
+<!--<web-app -->
+<!--   xmlns="http://java.sun.com/xml/ns/javaee" -->
+<!--   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" -->
+<!--   metadata-complete="true"-->
+<!--   version="2.5"> -->
+
+<!--  <description>-->
+<!--    Default web.xml file.  -->
+<!--    This file is applied to a Web application before it's own WEB_INF/web.xml file-->
+<!--  </description>-->
+
+
+<!--  &lt;!&ndash; ==================================================================== &ndash;&gt;-->
+<!--  &lt;!&ndash; Context params to control Session Cookies                            &ndash;&gt;-->
+<!--  &lt;!&ndash; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  &ndash;&gt;-->
+<!--  &lt;!&ndash; UNCOMMENT TO ACTIVATE-->
+<!--  <context-param>-->
+<!--    <param-name>org.mortbay.jetty.servlet.SessionDomain</param-name>-->
+<!--    <param-value>127.0.0.1</param-value>-->
+<!--  </context-param>-->
+
+<!--  <context-param>-->
+<!--    <param-name>org.mortbay.jetty.servlet.SessionPath</param-name>-->
+<!--    <param-value>/</param-value>-->
+<!--  </context-param>-->
+
+<!--  <context-param>-->
+<!--    <param-name>org.mortbay.jetty.servlet.MaxAge</param-name>-->
+<!--    <param-value>-1</param-value>-->
+<!--  </context-param>-->
+<!--  &ndash;&gt;-->
+
+<!--  <context-param>-->
+<!--    <param-name>org.mortbay.jetty.webapp.NoTLDJarPattern</param-name>-->
+<!--    <param-value>start.jar|ant-.*\.jar|dojo-.*\.jar|jetty-.*\.jar|jsp-api-.*\.jar|junit-.*\.jar|servlet-api-.*\.jar|dnsns\.jar|rt\.jar|jsse\.jar|tools\.jar|sunpkcs11\.jar|sunjce_provider\.jar|xerces.*\.jar</param-value>-->
+<!--  </context-param>-->
+<!--            -->
+
+
+<!--  &lt;!&ndash; ==================================================================== &ndash;&gt;-->
+<!--  &lt;!&ndash; The default servlet.                                                 &ndash;&gt;-->
+<!--  &lt;!&ndash; This servlet, normally mapped to /, provides the handling for static &ndash;&gt;-->
+<!--  &lt;!&ndash; content, OPTIONS and TRACE methods for the context.                  &ndash;&gt;-->
+<!--  &lt;!&ndash; The following initParameters are supported:                          &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   acceptRanges     If true, range requests and responses are         &ndash;&gt;-->
+<!--  &lt;!&ndash;                    supported                                         &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   dirAllowed       If true, directory listings are returned if no    &ndash;&gt;-->
+<!--  &lt;!&ndash;                    welcome file is found. Else 403 Forbidden.        &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   welcomeServlets  If true, attempt to dispatch to welcome files     &ndash;&gt;-->
+<!--  &lt;!&ndash;                    that are servlets, if no matching static          &ndash;&gt; -->
+<!--  &lt;!&ndash;                    resources can be found.                           &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   redirectWelcome  If true, redirect welcome file requests           &ndash;&gt;-->
+<!--  &lt;!&ndash;                    else use request dispatcher forwards              &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   gzip             If set to true, then static content will be served&ndash;&gt; -->
+<!--  &lt;!&ndash;                    as gzip content encoded if a matching resource is &ndash;&gt;-->
+<!--  &lt;!&ndash;                    found ending with ".gz"                           &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   resoureBase      Can be set to replace the context resource base   &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   relativeResourceBase                                               &ndash;&gt;-->
+<!--  &lt;!&ndash;                    Set with a pathname relative to the base of the   &ndash;&gt;-->
+<!--  &lt;!&ndash;                    servlet context root. Useful for only serving     &ndash;&gt;-->
+<!--  &lt;!&ndash;                    static content from only specific subdirectories. &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   useFileMappedBuffer                                                &ndash;&gt;-->
+<!--  &lt;!&ndash;                    If set to true (the default), a  memory mapped    &ndash;&gt;-->
+<!--  &lt;!&ndash;                    file buffer will be used to serve static content  &ndash;&gt;-->
+<!--  &lt;!&ndash;                    when using an NIO connector. Setting this value   &ndash;&gt;-->
+<!--  &lt;!&ndash;                    to false means that a direct buffer will be used  &ndash;&gt;-->
+<!--  &lt;!&ndash;                    instead. If you are having trouble with Windows   &ndash;&gt;-->
+<!--  &lt;!&ndash;                    file locking, set this to false.                  &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;  cacheControl      If set, all static content will have this value   &ndash;&gt;-->
+<!--  &lt;!&ndash;                    set as the cache-control header.                  &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;  maxCacheSize      Maximum size of the static resource cache         &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;  maxCachedFileSize Maximum size of any single file in the cache      &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;  maxCachedFiles    Maximum number of files in the cache              &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;  cacheType         "nio", "bio" or "both" to determine the type(s)   &ndash;&gt;-->
+<!--  &lt;!&ndash;                    of resource cache. A bio cached buffer may be used&ndash;&gt;-->
+<!--  &lt;!&ndash;                    by nio but is not as efficient as a nio buffer.   &ndash;&gt;-->
+<!--  &lt;!&ndash;                    An nio cached buffer may not be used by bio.      &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  &ndash;&gt;-->
+<!--  <servlet>-->
+<!--    <servlet-name>default</servlet-name>-->
+<!--    <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>-->
+<!--    <init-param>-->
+<!--      <param-name>acceptRanges</param-name>-->
+<!--      <param-value>true</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>dirAllowed</param-name>-->
+<!--      <param-value>true</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>welcomeServlets</param-name>-->
+<!--      <param-value>false</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>redirectWelcome</param-name>-->
+<!--      <param-value>false</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>maxCacheSize</param-name>-->
+<!--      <param-value>256000000</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>maxCachedFileSize</param-name>-->
+<!--      <param-value>10000000</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>maxCachedFiles</param-name>-->
+<!--      <param-value>1000</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>cacheType</param-name>-->
+<!--      <param-value>both</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>gzip</param-name>-->
+<!--      <param-value>true</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>useFileMappedBuffer</param-name>-->
+<!--      <param-value>false</param-value>-->
+<!--    </init-param>  -->
+<!--    &lt;!&ndash;-->
+<!--    <init-param>-->
+<!--      <param-name>cacheControl</param-name>-->
+<!--      <param-value>max-age=3600,public</param-value>-->
+<!--    </init-param>-->
+<!--    &ndash;&gt;-->
+<!--    <load-on-startup>0</load-on-startup>-->
+<!--  </servlet> -->
+
+<!--  <servlet-mapping> <servlet-name>default</servlet-name> <url-pattern>/</url-pattern> </servlet-mapping>-->
+<!--  -->
+
+<!--  &lt;!&ndash; ==================================================================== &ndash;&gt;-->
+<!--  &lt;!&ndash; JSP Servlet                                                          &ndash;&gt;-->
+<!--  &lt;!&ndash; This is the jasper JSP servlet from the jakarta project              &ndash;&gt;-->
+<!--  &lt;!&ndash; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  &ndash;&gt;-->
+<!--  &lt;!&ndash; The JSP page compiler and execution servlet, which is the mechanism  &ndash;&gt;-->
+<!--  &lt;!&ndash; used by Glassfish to support JSP pages.  Traditionally, this servlet &ndash;&gt;-->
+<!--  &lt;!&ndash; is mapped to URL patterh "*.jsp".  This servlet supports the         &ndash;&gt;-->
+<!--  &lt;!&ndash; following initialization parameters (default values are in square    &ndash;&gt;-->
+<!--  &lt;!&ndash; brackets):                                                           &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   checkInterval       If development is false and reloading is true, &ndash;&gt;-->
+<!--  &lt;!&ndash;                       background compiles are enabled. checkInterval &ndash;&gt;-->
+<!--  &lt;!&ndash;                       is the time in seconds between checks to see   &ndash;&gt;-->
+<!--  &lt;!&ndash;                       if a JSP page needs to be recompiled. [300]    &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   compiler            Which compiler Ant should use to compile JSP   &ndash;&gt;-->
+<!--  &lt;!&ndash;                       pages.  See the Ant documenation for more      &ndash;&gt;-->
+<!--  &lt;!&ndash;                       information. [javac]                           &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   classdebuginfo      Should the class file be compiled with         &ndash;&gt;-->
+<!--  &lt;!&ndash;                       debugging information?  [true]                 &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   classpath           What class path should I use while compiling   &ndash;&gt;-->
+<!--  &lt;!&ndash;                       generated servlets?  [Created dynamically      &ndash;&gt;-->
+<!--  &lt;!&ndash;                       based on the current web application]          &ndash;&gt;-->
+<!--  &lt;!&ndash;                       Set to ? to make the container explicitly set  &ndash;&gt;-->
+<!--  &lt;!&ndash;                       this parameter.                                &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   development         Is Jasper used in development mode (will check &ndash;&gt;-->
+<!--  &lt;!&ndash;                       for JSP modification on every access)?  [true] &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   enablePooling       Determines whether tag handler pooling is      &ndash;&gt;-->
+<!--  &lt;!&ndash;                       enabled  [true]                                &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   fork                Tell Ant to fork compiles of JSP pages so that &ndash;&gt;-->
+<!--  &lt;!&ndash;                       a separate JVM is used for JSP page compiles   &ndash;&gt;-->
+<!--  &lt;!&ndash;                       from the one Tomcat is running in. [true]      &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   ieClassId           The class-id value to be sent to Internet      &ndash;&gt;-->
+<!--  &lt;!&ndash;                       Explorer when using <jsp:plugin> tags.         &ndash;&gt;-->
+<!--  &lt;!&ndash;                       [clsid:8AD9C840-044E-11D1-B3E9-00805F499D93]   &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   javaEncoding        Java file encoding to use for generating java  &ndash;&gt;-->
+<!--  &lt;!&ndash;                       source files. [UTF-8]                          &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   keepgenerated       Should we keep the generated Java source code  &ndash;&gt;-->
+<!--  &lt;!&ndash;                       for each page instead of deleting it? [true]   &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   logVerbosityLevel   The level of detailed messages to be produced  &ndash;&gt;-->
+<!--  &lt;!&ndash;                       by this servlet.  Increasing levels cause the  &ndash;&gt;-->
+<!--  &lt;!&ndash;                       generation of more messages.  Valid values are &ndash;&gt;-->
+<!--  &lt;!&ndash;                       FATAL, ERROR, WARNING, INFORMATION, and DEBUG. &ndash;&gt;-->
+<!--  &lt;!&ndash;                       [WARNING]                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   mappedfile          Should we generate static content with one     &ndash;&gt;-->
+<!--  &lt;!&ndash;                       print statement per input line, to ease        &ndash;&gt;-->
+<!--  &lt;!&ndash;                       debugging?  [false]                            &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   reloading           Should Jasper check for modified JSPs?  [true] &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   suppressSmap        Should the generation of SMAP info for JSR45   &ndash;&gt;-->
+<!--  &lt;!&ndash;                       debugging be suppressed?  [false]              &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   dumpSmap            Should the SMAP info for JSR45 debugging be    &ndash;&gt;-->
+<!--  &lt;!&ndash;                       dumped to a file? [false]                      &ndash;&gt;-->
+<!--  &lt;!&ndash;                       False if suppressSmap is true                  &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   scratchdir          What scratch directory should we use when      &ndash;&gt;-->
+<!--  &lt;!&ndash;                       compiling JSP pages?  [default work directory  &ndash;&gt;-->
+<!--  &lt;!&ndash;                       for the current web application]               &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   tagpoolMaxSize      The maximum tag handler pool size  [5]         &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;   xpoweredBy          Determines whether X-Powered-By response       &ndash;&gt;-->
+<!--  &lt;!&ndash;                       header is added by generated servlet  [false]  &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash; If you wish to use Jikes to compile JSP pages:                       &ndash;&gt;-->
+<!--  &lt;!&ndash;   Set the init parameter "compiler" to "jikes".  Define              &ndash;&gt;-->
+<!--  &lt;!&ndash;   the property "-Dbuild.compiler.emacs=true" when starting Jetty     &ndash;&gt;-->
+<!--  &lt;!&ndash;   to cause Jikes to emit error messages in a format compatible with  &ndash;&gt;-->
+<!--  &lt;!&ndash;   Jasper.                                                            &ndash;&gt;-->
+<!--  &lt;!&ndash;   If you get an error reporting that jikes can't use UTF-8 encoding, &ndash;&gt;-->
+<!--  &lt;!&ndash;   try setting the init parameter "javaEncoding" to "ISO-8859-1".     &ndash;&gt;-->
+<!--  &lt;!&ndash; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  &ndash;&gt;-->
+<!--  <servlet id="jsp">-->
+<!--    <servlet-name>jsp</servlet-name>-->
+<!--    <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>-->
+<!--    <init-param>-->
+<!--        <param-name>logVerbosityLevel</param-name>-->
+<!--        <param-value>DEBUG</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--        <param-name>fork</param-name>-->
+<!--        <param-value>false</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--        <param-name>xpoweredBy</param-name>-->
+<!--        <param-value>false</param-value>-->
+<!--    </init-param>-->
+<!--    &lt;!&ndash;  -->
+<!--    <init-param>-->
+<!--        <param-name>classpath</param-name>-->
+<!--        <param-value>?</param-value>-->
+<!--    </init-param>-->
+<!--    &ndash;&gt;-->
+<!--    <load-on-startup>0</load-on-startup>-->
+<!--  </servlet>-->
+
+<!--  <servlet-mapping> -->
+<!--    <servlet-name>jsp</servlet-name> -->
+<!--    <url-pattern>*.jsp</url-pattern> -->
+<!--    <url-pattern>*.jspf</url-pattern>-->
+<!--    <url-pattern>*.jspx</url-pattern>-->
+<!--    <url-pattern>*.xsp</url-pattern>-->
+<!--    <url-pattern>*.JSP</url-pattern> -->
+<!--    <url-pattern>*.JSPF</url-pattern>-->
+<!--    <url-pattern>*.JSPX</url-pattern>-->
+<!--    <url-pattern>*.XSP</url-pattern>-->
+<!--  </servlet-mapping>-->
+<!--  -->
+<!--  &lt;!&ndash; ==================================================================== &ndash;&gt;-->
+<!--  &lt;!&ndash; Dynamic Servlet Invoker.                                             &ndash;&gt;-->
+<!--  &lt;!&ndash; This servlet invokes anonymous servlets that have not been defined   &ndash;&gt;-->
+<!--  &lt;!&ndash; in the web.xml or by other means. The first element of the pathInfo  &ndash;&gt;-->
+<!--  &lt;!&ndash; of a request passed to the envoker is treated as a servlet name for  &ndash;&gt;-->
+<!--  &lt;!&ndash; an existing servlet, or as a class name of a new servlet.            &ndash;&gt;-->
+<!--  &lt;!&ndash; This servlet is normally mapped to /servlet/*                        &ndash;&gt;-->
+<!--  &lt;!&ndash; This servlet support the following initParams:                       &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;  nonContextServlets       If false, the invoker can only load        &ndash;&gt;-->
+<!--  &lt;!&ndash;                           servlets from the contexts classloader.    &ndash;&gt;-->
+<!--  &lt;!&ndash;                           This is false by default and setting this  &ndash;&gt;-->
+<!--  &lt;!&ndash;                           to true may have security implications.    &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;  verbose                  If true, log dynamic loads                 &ndash;&gt;-->
+<!--  &lt;!&ndash;                                                                      &ndash;&gt;-->
+<!--  &lt;!&ndash;  *                        All other parameters are copied to the     &ndash;&gt;-->
+<!--  &lt;!&ndash;                           each dynamic servlet as init parameters    &ndash;&gt;-->
+<!--  &lt;!&ndash; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  &ndash;&gt;-->
+<!--  &lt;!&ndash; Uncomment for dynamic invocation-->
+<!--  <servlet>-->
+<!--    <servlet-name>invoker</servlet-name>-->
+<!--    <servlet-class>org.mortbay.jetty.servlet.Invoker</servlet-class>-->
+<!--    <init-param>-->
+<!--      <param-name>verbose</param-name>-->
+<!--      <param-value>false</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>nonContextServlets</param-name>-->
+<!--      <param-value>false</param-value>-->
+<!--    </init-param>-->
+<!--    <init-param>-->
+<!--      <param-name>dynamicParam</param-name>-->
+<!--      <param-value>anyValue</param-value>-->
+<!--    </init-param>-->
+<!--    <load-on-startup>0</load-on-startup>-->
+<!--  </servlet>-->
+
+<!--  <servlet-mapping> <servlet-name>invoker</servlet-name> <url-pattern>/servlet/*</url-pattern> </servlet-mapping>-->
+<!--  &ndash;&gt;-->
+
+
+
+<!--  &lt;!&ndash; ==================================================================== &ndash;&gt;-->
+<!--  <session-config>-->
+<!--    <session-timeout>30</session-timeout>-->
+<!--  </session-config>-->
+
+<!--  &lt;!&ndash; ==================================================================== &ndash;&gt;-->
+<!--  &lt;!&ndash; Default MIME mappings                                                &ndash;&gt;-->
+<!--  &lt;!&ndash; The default MIME mappings are provided by the mime.properties        &ndash;&gt;-->
+<!--  &lt;!&ndash; resource in the org.mortbay.jetty.jar file.  Additional or modified  &ndash;&gt;-->
+<!--  &lt;!&ndash; mappings may be specified here                                       &ndash;&gt;-->
+<!--  &lt;!&ndash; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  &ndash;&gt;-->
+<!--  &lt;!&ndash; UNCOMMENT TO ACTIVATE-->
+<!--  <mime-mapping>-->
+<!--    <extension>mysuffix</extension>-->
+<!--    <mime-type>mymime/type</mime-type>-->
+<!--  </mime-mapping>-->
+<!--  &ndash;&gt;-->
+
+<!--  &lt;!&ndash; ==================================================================== &ndash;&gt;-->
+<!--  <welcome-file-list>-->
+<!--    <welcome-file>index.html</welcome-file>-->
+<!--    <welcome-file>index.htm</welcome-file>-->
+<!--    <welcome-file>index.jsp</welcome-file>-->
+<!--  </welcome-file-list>-->
+
+<!--  &lt;!&ndash; ==================================================================== &ndash;&gt;-->
+<!--  <locale-encoding-mapping-list>-->
+<!--    <locale-encoding-mapping><locale>ar</locale><encoding>ISO-8859-6</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>be</locale><encoding>ISO-8859-5</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>bg</locale><encoding>ISO-8859-5</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>ca</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>cs</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>da</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>de</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>el</locale><encoding>ISO-8859-7</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>en</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>es</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>et</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>fi</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>fr</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>hr</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>hu</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>is</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>it</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>iw</locale><encoding>ISO-8859-8</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>ja</locale><encoding>Shift_JIS</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>ko</locale><encoding>EUC-KR</encoding></locale-encoding-mapping>     -->
+<!--    <locale-encoding-mapping><locale>lt</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>lv</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>mk</locale><encoding>ISO-8859-5</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>nl</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>no</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>pl</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>pt</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>ro</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>ru</locale><encoding>ISO-8859-5</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>sh</locale><encoding>ISO-8859-5</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>sk</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>sl</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>sq</locale><encoding>ISO-8859-2</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>sr</locale><encoding>ISO-8859-5</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>sv</locale><encoding>ISO-8859-1</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>tr</locale><encoding>ISO-8859-9</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>uk</locale><encoding>ISO-8859-5</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>zh</locale><encoding>GB2312</encoding></locale-encoding-mapping>-->
+<!--    <locale-encoding-mapping><locale>zh_TW</locale><encoding>Big5</encoding></locale-encoding-mapping>   -->
+<!--  </locale-encoding-mapping-list>-->
+<!--  -->
+<!--  <security-constraint>-->
+<!--    <web-resource-collection>-->
+<!--      <web-resource-name>Disable TRACE</web-resource-name>-->
+<!--      <url-pattern>/</url-pattern>-->
+<!--      <http-method>TRACE</http-method>-->
+<!--    </web-resource-collection>-->
+<!--    <auth-constraint/>-->
+<!--  </security-constraint>-->
+<!--  -->
+<!--</web-app>-->
+

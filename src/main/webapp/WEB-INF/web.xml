@@ -1,0 +1,67 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+
+  <display-name>Archetype Created Web Application</display-name>
+  <!-- 创建一个servlet -->
+  <servlet>
+    <!-- 设置servlet的名字 -->
+    <servlet-name>demo01</servlet-name>
+    <!-- 设置该servlet使用哪个类 全限定类名 -->
+    <servlet-class>testservlet.Demo01</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <!-- 给该servlet配置一个访问地址(映射地址) -->
+  <servlet-mapping>
+    <!--  配置哪个servlet的映射地址-->
+    <servlet-name>demo01</servlet-name>
+    <!--  配置映射地址
+     注意:这里的斜杠代表工程名后面斜杠-->
+    <url-pattern>/demo01</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>demo02</servlet-name>
+    <servlet-class>testservlet.Demo02</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>demo02</servlet-name>
+    <!--   配置访问路径通配
+      *.action只要是以.action结尾的访问路径
+      都可以访问到demo02这个servlet
+      /*项目目录下 随便输入网址 都能访问到 demo02
+      注意:上面两种方式不能连用-->
+    <url-pattern>/demo02</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>demo03</servlet-name>
+    <servlet-class>testservlet.Demo03</servlet-class>
+    <!--   添加servlet的配置信息-->
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>demo03</servlet-name>
+    <url-pattern>/demo03</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>gpmvc</servlet-name>
+    <servlet-class>com.gupaoedu.mvcframework.v1.servlet.GPDispatcherServlet</servlet-class>
+    <!--		<init-param>-->
+    <!--			<param-name>contextConfigLocation</param-name>-->
+    <!--			<param-value>application.properties</param-value>-->
+    <!--		</init-param>-->
+    <!--		<load-on-startup>1</load-on-startup>-->
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>gpmvc</servlet-name>
+    <url-pattern>/hehedada</url-pattern>
+  </servlet-mapping>
+
+</web-app>

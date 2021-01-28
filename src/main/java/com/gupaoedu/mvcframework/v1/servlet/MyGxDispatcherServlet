@@ -1,0 +1,209 @@
+package github.gaoxiang.mvcframework.v1.servletrealize;
+
+import github.gaoxiang.define.SpringEnum;
+import github.gaoxiang.mvcframework.annotation.GxAutowired;
+import github.gaoxiang.mvcframework.annotation.GxController;
+import github.gaoxiang.mvcframework.annotation.GxRequestMapping;
+import github.gaoxiang.mvcframework.annotation.GxService;
+import github.gaoxiang.util.MyStringUtils;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+/**
+ * @program: design-study
+ * @description: 自定义实现 Spring BeanFactory 以及相关注解的加载
+ * @author: gaoxiang
+ * @email: 630268696@qq.com
+ * @create: 2021-01-26 20:41
+ **/
+@Slf4j
+public class GXDispatcherServlet extends HttpServlet {
+    /**
+     * 没有对需要管理的内容进行区分
+     * 当前
+     * className -- Bean
+     * url -- method
+     * url -- bean
+     * 均存储在该 map 中
+     */
+    private Map<String, Object> mapping = new HashMap<>();
+
+    // HttpServlet 做了类似 Fiddle 的工作，是否存在性能问题
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        this.doPost(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            doDispatch(request, response);
+        } catch(Exception e) {
+            log.error("服务器错误没跑了 errorCode: {}", SpringEnum.RETURN_CODE.SERVICE_ERROR,e);
+        }
+    }
+
+    private void doDispatch(HttpServletRequest request, HttpServletResponse response) throws IOException, InvocationTargetException, IllegalAccessException {
+        // 根据请求 Url 进行分发，当前版本忽略入参处理逻辑
+        // 看起来这个东东要到 Tomcat 里运行喽，事情有点尴尬了
+        String url = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        //TODO 为什么这么替换，只有等运行的时候才知道了
+        url = url.replace(contextPath, "").replaceAll("/+", "/");
+        if(!this.mapping.containsKey(url)) {
+            response.getWriter().write("404 Not Found!!");
+            return;
+        }
+        Method method = (Method) this.mapping.get(url);
+        Map<String, String[]> params = request.getParameterMap();
+        //TODO 讲道理应该在这里对入参进行处理 看起来只传入了一个参数 —— Name
+        //TODO 意思是直接放弃了处理入参信息了嘛
+        method.invoke(this.mapping.get(method.getDeclaringClass().getName()),new Object[]{request,response,params.get("name")[0]});
+        // 当前版本应该只能处理 sayYourName 方法
+    }
+
+    /**
+     * 填充我们的血肉
+     * @param config TODO 应该指 TomCat 服务器配置信息
+     * @throws ServletException 服务器异常
+     */
+    @Override
+    public void init(ServletConfig config) {
+        // 初始化框架，解析注解内容，构造我们的 Spring 容器
+        // 加载配置信息
+        InputStream inputStream = null;
+        try {
+            Properties configContext = new Properties();
+            inputStream = this.getClass().getClassLoader().getResourceAsStream(config.getInitParameter(SpringEnum.CONTEXT_CONFIG_LOCATION));
+            configContext.load(inputStream);
+            String scanPackage = configContext.getProperty(SpringEnum.SCAN_PACKAGE);
+            // 解析指定包路径，搭建框架 这个过程应该依赖于 TomCat 了吧
+            doScanner(scanPackage);
+            // 根据解析获得的类 进行填充操作
+            for(String className : mapping.keySet()) {
+                // 重复加载Spring，避免方法映射影响结果
+                if(!className.contains(".")) {
+                    // url - method 键值对
+                    continue;
+                }
+                Class<?> clazz = Class.forName(className);
+                //TODO 注解都是这样处理的嘛？ 应该会有专门的模块处理注解才对吧
+                if(clazz.isAnnotationPresent(GxController.class)) {
+                    // 对 Controller 注解的类进行实例化
+                    mapping.put(className,clazz.newInstance());
+                    String baseUrl = "";
+                    // 将 url - method 装载到 mapping 中
+                    if(clazz.isAnnotationPresent(GxRequestMapping.class)) {
+                        GxRequestMapping requestMapping = clazz.getAnnotation(GxRequestMapping.class);
+                        baseUrl = requestMapping.value();
+                        // 获取类上声明的路径
+                        //TODO 配置文件内路径、类路径、方法路径
+                    }
+                    Method[] methods = clazz.getMethods();
+                    for(Method method : methods) {
+                        if(!method.isAnnotationPresent(GxRequestMapping.class)) { continue; }
+                        // TODO 将声明为对外接口的方法填充到 Mapping 内
+                        GxRequestMapping requestMapping = method.getAnnotation(GxRequestMapping.class);
+                        //TODO 替换的目的是去掉 url 中的空格嘛？ 可以 Java 内部没有Url编码呀 ？？
+                        String url = (baseUrl + "/" + requestMapping.value()).replaceAll(SpringEnum.SPILT_TAG, SpringEnum.REPLACE_SPILT_TAG);
+                        mapping.put(url, method);
+                        log.info("装载对外方法: 请求地址: {} 目标方法: {}", url, method);
+                    }
+                } else if(clazz.isAnnotationPresent(GxService.class)) {
+                    // 对 Service 标签进行实例化操作，用来丰满 Controller
+                    //TODO 实际项目中 Service 也支持 Autowire，也是这样的判断逻辑嘛？
+                    GxService service = clazz.getAnnotation(GxService.class);
+                    // 也就是说如果没有为 Service 指定名称，使用 类名
+                    // 这也解释了 方法名作为 Bean 对象等的实现原理，整体上用了反射那一套
+                    String beanName = service.value();
+                    if(MyStringUtils.isEmpty(beanName)) {
+                        beanName = clazz.getName();
+                    }
+                    Object instance = clazz.newInstance();
+                    // 将 Service注解声明的name - 对象实例 填充到 mapping
+                    mapping.put(beanName, instance);
+                    // 将 instance 实现的接口 - instance对象 填充到 mapping
+                    for(Class<?> i : clazz.getInterfaces()) {
+                        mapping.put(i.getName(), instance);
+                    }
+                } else {
+                    // 暂时没有更多的注解
+                    //TODO Spring 这里是怎么实现的，不可能这么多判断吧
+                    continue;
+                }
+            }
+            // 描述 - 对象 Map 装载完成，开始填充 Controller
+            for(Object object : mapping.values()) {
+                // 如果动态加载的话，对于已经填充的 Controller 重复填充肯定是不好的吧
+                if(object == null) {continue;}
+                Class clazz = object.getClass();
+                if(clazz.isAnnotationPresent(GxController.class)) {
+                    Field[] fields = clazz.getDeclaredFields();
+                    for(Field field : fields) {
+                        if(!field.isAnnotationPresent(GxAutowired.class)) {
+                            continue;
+                        }
+                        GxAutowired autowired = field.getAnnotation(GxAutowired.class);
+                        String beanName = autowired.value();
+                        if(MyStringUtils.isEmpty(beanName)) {
+                            beanName = field.getType().getName();
+                        }
+                        field.setAccessible(true);
+                        // 前者是声明 Autowire 的Controller,后者是Autowire声明对应的 bean 实例
+                        field.set(mapping.get(clazz.getName()),mapping.get(beanName));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("初始化容器过程中出现错误: ", e);
+        } finally {
+            // 关闭输入流，避免资源浪费
+            if(inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    log.error("关闭文件输入流出现错误", e);
+                }
+            }
+        }
+        log.info("GX MVC Framework 容器初始化完成");
+    }
+
+    /**
+     * 根据配置文件扫描指定路径，并将其设置为 键值对 形式
+     * @param scanPackage 目标包目录
+     */
+    private void doScanner(String scanPackage) {
+        // 这里把 包名内的 . 替换为了 / ; 问题在于 他并没有解析 RequestMapping 呀
+        URL url = this.getClass().getClassLoader().getResource("/" + scanPackage.replaceAll("\\.","/"));
+        File classDir = new File(url.getFile());
+        // 递归的将指定目录下的所有类名称装载到 Map 内，之后会对其进行填充
+        for(File file: classDir.listFiles()) {
+            if(file.isDirectory()) {
+                doScanner(scanPackage + "." + file.getName());
+            } else {
+                // 将 .class 结尾的类文件加载到 map 中，也解释了为什么文件名与类名保持一致
+                if(file.getName().endsWith(".class")) {
+                    String clazzName = (scanPackage + "." + file.getName().replace(".class", ""));
+                    mapping.put(clazzName, null);
+                }
+            }
+        }
+        //TODO 真的要运行，应该依赖 Tomcat 吧，Request 的 Http 协议并不是我们做的
+    }
+}
