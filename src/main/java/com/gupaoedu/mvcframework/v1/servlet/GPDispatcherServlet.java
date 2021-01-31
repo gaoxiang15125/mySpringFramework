@@ -36,6 +36,7 @@ public class GPDispatcherServlet extends HttpServlet {
             configContext.load(is);
             String scanPackage = configContext.getProperty("scanPackage");
             doScanner(scanPackage);
+            // 此处明显存在问题，至少要使用迭代器或者别的什么解决下 for 循环，次数改变就会报错？？增加也错？
             for (String className : mapping.keySet()) {
                 if(!className.contains(".")){continue;}
                 Class<?> clazz = Class.forName(className);
@@ -85,6 +86,7 @@ public class GPDispatcherServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }finally {
             if(is != null){
                 try {is.close();} catch (IOException e) {

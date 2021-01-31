@@ -52,12 +52,12 @@
 
   <servlet>
     <servlet-name>gpmvc</servlet-name>
-    <servlet-class>com.gupaoedu.mvcframework.v1.servlet.GPDispatcherServlet</servlet-class>
-    <!--		<init-param>-->
-    <!--			<param-name>contextConfigLocation</param-name>-->
-    <!--			<param-value>application.properties</param-value>-->
-    <!--		</init-param>-->
-    <!--		<load-on-startup>1</load-on-startup>-->
+    <servlet-class>com.gupaoedu.mvcframework.v2.servlet.GxDispatcherServlet</servlet-class>
+    		<init-param>
+    			<param-name>contextConfigLocation</param-name>
+    			<param-value>application.properties</param-value>
+    		</init-param>
+    		<load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>gpmvc</servlet-name>
